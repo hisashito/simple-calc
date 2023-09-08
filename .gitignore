@@ -27,6 +27,8 @@ replay_pid*
 
 .idea/
 *.iml
+*.iws
+
 .classpath
 .project
 out/
