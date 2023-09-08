@@ -1,5 +1,4 @@
 
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +14,7 @@ public class Main {
     static String cmdExit = "/exit";
     static String msgHelp = "The program calculates the sum of numbers";
     static String msgUnkCmd = "Unknown command";
+    static String msgUnkVar = "Unknown variable";
     static String msgInvalidExpr = "Invalid expression";
     static String msgBye = "Bye!";
 
@@ -22,10 +22,10 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String str;
         while (!(str = scanner.nextLine()).matches(cmdExit)) {
-            if(str.trim().isEmpty()){
+            if (str.trim().isEmpty()) {
                 continue;
             }
-            if (str.charAt(0)== '/'){
+            if (str.charAt(0) == '/') {
                 if (str.matches(cmdHelp)) {
                     System.out.println(msgHelp);
                 } else {
@@ -36,12 +36,9 @@ public class Main {
                 switch (expression.getType()) {
                     case ARITMETIC ->
                             processAritmeticExpression(expression.getTermsAndOperators()).ifPresent(System.out::println);
-                    case ASSIGNMENT ->
-                            processAssignmentExpression(expression.getTermsAndOperators());
-                    case EMPTY ->
-                            System.out.println();
-                    case INVALID ->
-                            System.out.println("Invalid Expression");
+                    case ASSIGNMENT -> processAssignmentExpression(expression.getTermsAndOperators());
+                    case EMPTY -> System.out.println();
+                    case INVALID -> System.out.println(msgInvalidExpr);
                 }
             }
         }
@@ -64,34 +61,23 @@ public class Main {
                 .filter(elem -> elem.matches(regVars) && !varMap.containsKey(elem))
                 .findAny()
                 .isPresent()) {
-            System.out.println("Unknown variable");
+            System.out.println(msgUnkVar);
             return Optional.ofNullable(null);
         }
         termsAndOps.forEach(elem -> {
-            if (elem.matches(regNums)) {
+            if (elem.matches(regNums) || elem.matches(regVars)) {
+                int value = elem.matches(regVars) ? varMap.get(elem) : Integer.parseInt(elem);
                 if (operators.isEmpty()) {
-                    res[0] += Integer.parseInt(elem);
+                    res[0] += value; //Integer.parseInt(elem);
                 } else {
                     String op = operators.pop();
                     switch (op) {
-                        case "+" -> res[0] += Integer.parseInt(elem);
-                        case "-" -> res[0] -= Integer.parseInt(elem);
+                        case "+" -> res[0] += value; //Integer.parseInt(elem);
+                        case "-" -> res[0] -= value; //Integer.parseInt(elem);
                     }
                 }
             } else if (elem.matches(regOps)) {
                 operators.push(elem);
-            } else if (elem.matches(regVars)) {
-                // System.out.println("var to be retreived:" + elem);
-                int val = varMap.get(elem);
-                if (operators.isEmpty()) {
-                    res[0] += val;
-                } else {
-                    String op = operators.pop();
-                    switch (op) {
-                        case "+" -> res[0] += val;
-                        case "-" -> res[0] -= val;
-                    }
-                }
             }
         });
         return Optional.of(res[0]);
@@ -194,5 +180,4 @@ public class Main {
             return type;
         }
     }
-
 }
