@@ -1,5 +1,6 @@
 
 import java.util.*;
+import java.math.BigInteger;
 
 public class Main {
 
@@ -8,7 +9,8 @@ public class Main {
     static String regAdditionOps = "[+\\-]";
     static String regProductOps = "[*/]";
     static ExpressionFactory expressionFactory = new ExpressionFactory();
-    static Map<String, Integer> varMap = new TreeMap<>();
+    // static Map<String, Integer> varMap = new TreeMap<>();
+    static Map<String, BigInteger> varMap = new TreeMap<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -39,10 +41,12 @@ public class Main {
         System.out.println("Bye!");
     }
 
-    public static Optional<Integer> processAritmeticExpression(List<String> termsAndOps) {
+    // public static Optional<Integer> processAritmeticExpression(List<String> termsAndOps) {
+    public static Optional<BigInteger> processAritmeticExpression(List<String> termsAndOps) {
         Deque<String> operators = new ArrayDeque<>();
         Deque<String> postfix = new ArrayDeque<>();
-        Deque<Integer> output = new ArrayDeque<>();
+        // Deque<Integer> output = new ArrayDeque<>();
+        Deque<BigInteger> output = new ArrayDeque<>();
         if (termsAndOps
                 .stream()
                 .filter(elem -> elem.matches(regVars) && !varMap.containsKey(elem))
@@ -87,18 +91,34 @@ public class Main {
 
         while (!postfix.isEmpty()) {
             // System.out.println("POSTFIX: "+ postfix);
-            if (postfix.peekFirst().matches(regNums)) {
-                output.offerFirst(Integer.parseInt(postfix.pop()));
-            } else {
-                int operand2 = output.pop();
 
-                int operand1 = output.peekFirst() == null ? 0 : output.pop();
-                int tempRes;
+            /**
+             * the conditionals could be more specific in case there is an invalid symbol
+             * that could not be detected before.
+             */
+
+            if (postfix.peekFirst().matches(regNums)) {
+                // output.offerFirst(Integer.parseInt(postfix.pop()));
+                output.offerFirst(new BigInteger(postfix.pop()));
+            } else {
+                //int operand2 = output.pop();
+                // int operand1 = output.peekFirst() == null ? 0 : output.pop();
+                // int tempRes;
+                BigInteger operand2 = output.pop();
+                BigInteger operand1 = output.peekFirst() == null ? BigInteger.ZERO : output.pop();
+                BigInteger tempRes;
                 switch (postfix.pop()) {
-                    case "+" -> tempRes = operand1 + operand2;
-                    case "-" -> tempRes = operand1 - operand2;
-                    case "/" -> tempRes = operand1 / operand2;
-                    case "*" -> tempRes = operand1 * operand2;
+                    case "+" -> tempRes = operand1.add(operand2); // operand1 + operand2
+                    case "-" -> tempRes = operand1.subtract(operand2); // operand1 - operand2
+                    case "/" -> {
+                        if (!BigInteger.ZERO.equals(operand2)) {
+                            tempRes = operand1.divide(operand2); // operand1 / operand2
+                        } else {
+                            System.out.println("Division by Zero!");
+                            return Optional.ofNullable(null);
+                        }
+                    }
+                    case "*" -> tempRes = operand1.multiply(operand2); // operand1 * operand2
                     default -> {
                         System.out.println("Invalid expression");
                         return Optional.ofNullable(null);
@@ -114,9 +134,11 @@ public class Main {
 
     public static void processAssignmentExpression(List<String> termsAndOps) {
         String leftSide = termsAndOps.get(0);
-        Optional<Integer> rightSide = processAritmeticExpression(termsAndOps.subList(2, termsAndOps.size()));
+        // Optional<BigInteger> rightSide = processAritmeticExpression(termsAndOps.subList(2, termsAndOps.size()));
+        Optional<BigInteger> rightSide = processAritmeticExpression(termsAndOps.subList(2, termsAndOps.size()));
         if (rightSide.isPresent()) {
-            int rs = rightSide.get();
+            // int rs = rightSide.get();
+            BigInteger rs = rightSide.get();
             varMap.put(leftSide, rs);
         }
     }
