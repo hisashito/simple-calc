@@ -1,2 +1,2 @@
 # simple-calc
-a calculator that adds, subtracts, multiplies and also remembers previous calculations (console app)
+a calculator that adds, subtracts, multiplies and also can store values in variables (console app)
