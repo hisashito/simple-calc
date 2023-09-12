@@ -31,7 +31,7 @@ public class Main {
 
                 Expression expression = expressionFactory.getExpression(str);
                 switch (expression.getType()) {
-                    case ARITHMETIC -> processAritmeticExpression(expression.getTerms()).ifPresent(System.out::println);
+                    case ARITHMETIC -> processArithmeticExpression(expression.getTerms()).ifPresent(System.out::println);
                     case ASSIGNMENT -> processAssignmentExpression(expression.getTerms());
                     case EMPTY -> System.out.println();
                     case INVALID -> System.out.println("Invalid Expression");
@@ -42,7 +42,7 @@ public class Main {
     }
 
     // public static Optional<Integer> processAritmeticExpression(List<String> termsAndOps) {
-    public static Optional<BigInteger> processAritmeticExpression(List<String> termsAndOps) {
+    public static Optional<BigInteger> processArithmeticExpression(List<String> termsAndOps) {
         Deque<String> operators = new ArrayDeque<>();
         Deque<String> postfix = new ArrayDeque<>();
         // Deque<Integer> output = new ArrayDeque<>();
@@ -135,7 +135,7 @@ public class Main {
     public static void processAssignmentExpression(List<String> termsAndOps) {
         String leftSide = termsAndOps.get(0);
         // Optional<BigInteger> rightSide = processAritmeticExpression(termsAndOps.subList(2, termsAndOps.size()));
-        Optional<BigInteger> rightSide = processAritmeticExpression(termsAndOps.subList(2, termsAndOps.size()));
+        Optional<BigInteger> rightSide = processArithmeticExpression(termsAndOps.subList(2, termsAndOps.size()));
         if (rightSide.isPresent()) {
             // int rs = rightSide.get();
             BigInteger rs = rightSide.get();
